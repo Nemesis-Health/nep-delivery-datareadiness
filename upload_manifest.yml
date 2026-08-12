@@ -1,0 +1,4 @@
+# Files that the network partner must upload after running the LEP.
+# These are validated by the Submission Portal on receipt.
+required_files:
+  - concepts_general.csv

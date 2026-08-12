@@ -1,0 +1,15 @@
+delivery_id: datareadiness
+version: "0.1.0"
+
+contacts:
+  ProjectOwner:
+    name: Nemesis Health
+    email: nep.test@nemesis.health
+  Stakeholder:
+    name: Nemesis Health
+    email: nep.test@nemesis.health
+  Admin:
+    name: Nemesis Health
+    email: nep.test@nemesis.health
+
+github_url: https://github.com/Nemesis-Health/nep-ci

@@ -277748,4 +277748,6 @@ coalesce(cast(p_97 as text), '') || '~' ||
 coalesce(cast(cnt as text), '')
 as measurement
 from lab_values
+union
+select 'x' as domain, null as source, null as standard, 0 as cnt, null as measurement
 ;

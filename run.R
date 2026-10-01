@@ -2,12 +2,31 @@ library(DatabaseConnector)
 library(SqlRender)
 
 # ── Connection parameters from environment ────────────────────────────────────
-db_host   <- Sys.getenv("OMOP_DB_HOST",   "localhost")
-db_port   <- as.integer(Sys.getenv("OMOP_DB_PORT", "5432"))
-db_name   <- Sys.getenv("OMOP_DB_NAME",   "omop")
-db_user   <- Sys.getenv("OMOP_DB_USER",   "nep_ci")
-db_pass   <- Sys.getenv("OMOP_DB_PASS",   "")
-cdm_schema <- Sys.getenv("OMOP_CDM_SCHEMA", "synpuf")
+required_env <- function(name, hint) {
+  val <- Sys.getenv(name, "")
+  if (!nzchar(val)) {
+    stop(sprintf("Missing required environment variable %s (%s)", name, hint), call. = FALSE)
+  }
+  val
+}
+
+db_host <- required_env("OMOP_DB_HOST", "OMOP database host")
+db_port <- as.integer(required_env("OMOP_DB_PORT", "OMOP database port"))
+if (is.na(db_port) || db_port <= 0) {
+  stop("OMOP_DB_PORT must be a positive integer", call. = FALSE)
+}
+dbms <- tolower(required_env("OMOP_DBMS", "OMOP DBMS (SQLRender-compatible name)"))
+if (!identical(dbms, "postgresql")) {
+  stop(sprintf("Unsupported OMOP_DBMS '%s' for this delivery. Expected 'postgresql'.", dbms), call. = FALSE)
+}
+db_name <- required_env("OMOP_DB_NAME", "OMOP database name")
+db_user <- required_env("OMOP_DB_USER", "OMOP database user")
+db_pass <- required_env("OMOP_DB_PASS", "OMOP database password")
+cdm_schema <- required_env("OMOP_CDM_SCHEMA", "OMOP CDM schema name")
+vocab_schema <- Sys.getenv("OMOP_VOCAB_SCHEMA", cdm_schema)
+if (!nzchar(vocab_schema)) {
+  vocab_schema <- cdm_schema
+}
 
 output_dir <- Sys.getenv("OUTPUT_DIR", "/output")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
@@ -26,7 +45,7 @@ sql_file <- "concepts_general.sql"
 
 # ── Connect ───────────────────────────────────────────────────────────────────
 connectionDetails <- createConnectionDetails(
-  dbms     = "postgresql",
+  dbms     = dbms,
   server   = paste0(db_host, "/", db_name),
   user     = db_user,
   password = db_pass,
@@ -43,9 +62,14 @@ schema <- cdm_schema
 if (nchar(schema) > 0 && !endsWith(schema, "."))
   schema <- paste0(schema, ".")
 
+vocab <- vocab_schema
+if (nchar(vocab) > 0 && !endsWith(vocab, "."))
+  vocab <- paste0(vocab, ".")
+
 # ── Read and execute SQL ──────────────────────────────────────────────────────
 s <- readr::read_file(sql_file)
 s <- gsub("@cdm_schema.", schema, s)
+s <- gsub("@vocab_schema.", vocab, s)
 # Qualify the concepts DROP to pg_temp to avoid touching any permanent table
 s <- gsub("(?i)drop\\s+table\\s+if\\s+exists\\s+concepts\\b",
           "drop table if exists pg_temp.concepts", s, perl = TRUE)

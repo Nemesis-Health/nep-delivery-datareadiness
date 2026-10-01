@@ -1,6 +1,5 @@
 delivery_id: datareadiness
-version: "0.1.0"
-
+version: 0.2.12
 contacts:
   ProjectOwner:
     name: Nemesis Health
@@ -11,5 +10,4 @@ contacts:
   Admin:
     name: Nemesis Health
     email: nep.test@nemesis.health
-
-github_url: https://github.com/Nemesis-Health/nep-ci
+github_url: https://github.com/Nemesis-Health/nep-delivery-datareadiness-cpp

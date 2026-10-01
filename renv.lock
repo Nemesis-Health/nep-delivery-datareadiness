@@ -8,5 +8,24 @@
       }
     ]
   },
-  "Packages": {}
+  "Packages": {
+    "DatabaseConnector": {
+      "Package": "DatabaseConnector",
+      "Version": "7.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "SqlRender": {
+      "Package": "SqlRender",
+      "Version": "1.19.5",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
+    "readr": {
+      "Package": "readr",
+      "Version": "2.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    }
+  }
 }
